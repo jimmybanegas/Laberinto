@@ -9,11 +9,12 @@ Personaje::Personaje(int x,int y,SDL_Surface*imagen)
     this->activo=true;
 }
 
+
+
 void Personaje::dibujar(SDL_Surface*screen)
 {
     //Holds offsets
     SDL_Rect offset;
-
     //Get offsets
     offset.x = x*75;
     offset.y = y*75;
@@ -25,4 +26,20 @@ void Personaje::dibujar(SDL_Surface*screen)
 Personaje::~Personaje()
 {
     //dtor
+}
+
+
+void Personaje::recibirAtaque()
+{
+   this->vida-=10;
+}
+
+void Personaje::setX(int x)
+{
+    this->x=x;
+}
+
+void Personaje::setY(int y)
+{
+    this->y=y;
 }

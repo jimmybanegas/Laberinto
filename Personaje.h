@@ -12,6 +12,9 @@ class Personaje
         SDL_Surface*imagen;
         Personaje(int x,int y,SDL_Surface*personaje);
         void dibujar(SDL_Surface *screen);
+        void recibirAtaque();
+        void setX(int x);
+        void setY(int y);
         virtual ~Personaje();
     protected:
     private:

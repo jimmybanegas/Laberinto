@@ -49,3 +49,19 @@
 1385431861 source:c:\users\auditor3\desktop\labparcial3-master\personaje.cpp
 	"Personaje.h"
 
+1385500837 source:c:\users\affisa-jimmy\documents\progra3\laberinto\main.cpp
+	"SDL/SDL.h"
+	"SDL/SDL_image.h"
+	"SDL/SDL_ttf.h"
+	<string>
+	<iostream>
+	<fstream>
+	"Personaje.h"
+
+1385491727 c:\users\affisa-jimmy\documents\progra3\laberinto\personaje.h
+	"SDL/SDL.h"
+	"SDL/SDL_image.h"
+
+1385491781 source:c:\users\affisa-jimmy\documents\progra3\laberinto\personaje.cpp
+	"Personaje.h"
+
