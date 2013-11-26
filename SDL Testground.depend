@@ -1,0 +1,51 @@
+# depslib dependency file v1.0
+1385170294 source:/home/turupawn/Projects/CodeBlocks/Progra 3/Ejemplos/SDL Testground/main.cpp
+	"SDL/SDL.h"
+	"SDL/SDL_image.h"
+	"SDL/SDL_ttf.h"
+	<string>
+	"Personaje.h"
+
+1385167783 source:/home/turupawn/Projects/CodeBlocks/Progra 3/Ejemplos/SDL Testground/Personaje.cpp
+	"Personaje.h"
+
+1385167523 /home/turupawn/Projects/CodeBlocks/Progra 3/Ejemplos/SDL Testground/Personaje.h
+	"SDL/SDL.h"
+	"SDL/SDL_image.h"
+
+1383353753 source:/home/turupawn/Projects/CodeBlocks/Progra 3/Ejemplos/SDL Testground/Enemigo.cpp
+	"Enemigo.h"
+
+1383356230 /home/turupawn/Projects/CodeBlocks/Progra 3/Ejemplos/SDL Testground/Enemigo.h
+	"SDL/SDL.h"
+	"SDL/SDL_image.h"
+	<string>
+	<vector>
+	"Personaje.h"
+
+1383356289 source:/home/turupawn/Projects/CodeBlocks/Progra 3/Ejemplos/SDL Testground/Fantasmita.cpp
+	"Fantasmita.h"
+
+1383356245 /home/turupawn/Projects/CodeBlocks/Progra 3/Ejemplos/SDL Testground/Fantasmita.h
+	"Enemigo.h"
+
+1383356311 source:/home/turupawn/Projects/CodeBlocks/Progra 3/Ejemplos/SDL Testground/Bomba.cpp
+	"Bomba.h"
+
+1383356301 /home/turupawn/Projects/CodeBlocks/Progra 3/Ejemplos/SDL Testground/Bomba.h
+	"Enemigo.h"
+
+1385433170 source:c:\users\auditor3\desktop\labparcial3-master\main.cpp
+	"SDL/SDL.h"
+	"SDL/SDL_image.h"
+	"SDL/SDL_ttf.h"
+	<string>
+	"Personaje.h"
+
+1385432572 c:\users\auditor3\desktop\labparcial3-master\personaje.h
+	"SDL/SDL.h"
+	"SDL/SDL_image.h"
+
+1385431861 source:c:\users\auditor3\desktop\labparcial3-master\personaje.cpp
+	"Personaje.h"
+
