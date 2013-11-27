@@ -235,8 +235,9 @@ int main( int argc, char* args[] )
     {
         return 1;
     }
-    bool first_time = true, first_it = true;
-    Mix_PlayMusic(music, -1);
+
+  //  bool first_time = true, first_it = true;
+ //   Mix_PlayMusic(music, -1);
 
    //Quit flag
     bool quit = false;
@@ -301,32 +302,31 @@ int main( int argc, char* args[] )
             //If a key was pressed
             if( event.type == SDL_KEYDOWN )
             {
-                /*   if(cursor_y>2)
-                        cursor_y=2;
+                     if(cursor_y>5)
+                        cursor_y=5;
 
-                     if(cursor_y<-2)
-                        cursor_y=-2;
+                     if(cursor_y<-5)
+                        cursor_y=-5;
 
-                     if(cursor_x>2)
-                      cursor_x=2;
+                     if(cursor_x>5)
+                      cursor_x=5;
 
-                     if(cursor_x<-2)
-                        cursor_x=-2;*/
-
+                     if(cursor_x<-5)
+                        cursor_x=-5;
                 //Set the proper message surface
                 switch( event.key.keysym.sym )
                 {
                     case SDLK_UP:
-                        cursor_y--;
+                          cursor_y--;
                     break;
                     case SDLK_DOWN:
-                        cursor_y++;
+                         cursor_y++;
                     break;
                     case SDLK_LEFT:
-                        cursor_x--;
+                         cursor_x--;
                     break;
                     case SDLK_RIGHT:
-                        cursor_x++;
+                         cursor_x++;
                     break;
                     case SDLK_RETURN:
                          if(turno)
@@ -335,22 +335,14 @@ int main( int argc, char* args[] )
                              {
                                 personaje.setX(cursor_x);
                                 personaje.setY(cursor_y);
-
-                                 std::ofstream out("cursor.txt");
-                                 out<<cursor_x<<" ";
-                                 out<<cursor_y<<" ";
-
                                 personaje2.recibirAtaque();
-
                                 cursor_x=personaje.x;
                                 cursor_y=personaje.y;
 
-                                //actual.dibujar(screen);
                                 limpiar(tablero_de_pasos);
                                 marcar(tablero,tablero_de_pasos,personaje.x,personaje.y,3);
 
                                 turno=false;
-
                              }
 
                             }
@@ -362,26 +354,18 @@ int main( int argc, char* args[] )
                                 personaje2.setY(cursor_y);
 
                                 personaje.recibirAtaque();
-
-                                 std::ofstream out("cursor.txt");
-                                 out<<cursor_x<<" ";
-                                 out<<cursor_y<<" ";
-
                                 cursor_x=personaje2.x;
                                 cursor_y=personaje2.y;
 
-                                //actual.dibujar(screen);
                                 limpiar(tablero_de_pasos);
                                 marcar(tablero,tablero_de_pasos2,personaje2.x,personaje2.y,3);
 
                                 turno=true;
-
                                }
                             }
                     break;
                 }
             }
-
 
             //If the user has Xed out the window
             else if( event.type == SDL_QUIT )
