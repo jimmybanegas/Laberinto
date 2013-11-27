@@ -21,7 +21,7 @@ const int SCREEN_BPP = 32;
 SDL_Surface *background = NULL;
 SDL_Surface *message = NULL;
 SDL_Surface *screen = NULL;
-Mix_Music *BGM = NULL;
+Mix_Music *music = NULL;
 
 bool turno=true;
 
@@ -134,7 +134,7 @@ void clean_up()
 
     //Close the font
     TTF_CloseFont( font );
-     Mix_FreeMusic( BGM );
+     Mix_FreeMusic( music );
 
     //Quit SDL_ttf
     TTF_Quit();
@@ -229,14 +229,14 @@ int main( int argc, char* args[] )
         return 1;
     }
 
-    BGM = Mix_LoadMUS( "BGM.mp3" );
+    music = Mix_LoadMUS( "music.mp3" );
 
-    if( BGM == NULL )
+    if( music == NULL )
     {
         return 1;
     }
     bool first_time = true, first_it = true;
-    Mix_PlayMusic(BGM, -1);
+    Mix_PlayMusic(music, -1);
 
    //Quit flag
     bool quit = false;
@@ -287,8 +287,6 @@ int main( int argc, char* args[] )
 
     SDL_Surface * msj1 = TTF_RenderText_Solid( font, "Personaje 1", textColor );
     SDL_Surface * msj2 = TTF_RenderText_Solid( font, "Personaje 2", textColor );
-
-
 
     //While the user hasn't quit
     while( quit == false )
