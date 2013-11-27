@@ -8,7 +8,6 @@ class Personaje
 {
     public:
         int x,y,vida;
-        bool activo;
         SDL_Surface*imagen;
         Personaje(int x,int y,SDL_Surface*personaje);
         void dibujar(SDL_Surface *screen);

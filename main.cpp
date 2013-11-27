@@ -5,6 +5,7 @@ and may not be redistributed without written permission.*/
 #include "SDL/SDL.h"
 #include "SDL/SDL_image.h"
 #include "SDL/SDL_ttf.h"
+#include "SDL/SDL_mixer.h"
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -18,16 +19,14 @@ const int SCREEN_BPP = 32;
 
 //The surfaces
 SDL_Surface *background = NULL;
-SDL_Surface *upMessage = NULL;
-SDL_Surface *downMessage = NULL;
-SDL_Surface *leftMessage = NULL;
-SDL_Surface *rightMessage = NULL;
 SDL_Surface *message = NULL;
 SDL_Surface *screen = NULL;
+Mix_Music *BGM = NULL;
+
+bool turno=true;
 
  int cursor_x=0;
  int cursor_y=0;
-
 
 
 //The event structure
@@ -60,10 +59,6 @@ SDL_Surface *load_image( std::string filename )
 {
     return IMG_Load( filename.c_str() );
 }
-
-
-
-
 
 void apply_surface( int x, int y, SDL_Surface* source, SDL_Surface* destination, SDL_Rect* clip = NULL )
 {
@@ -102,7 +97,7 @@ bool init()
     }
 
     //Set the window caption
-    SDL_WM_SetCaption( "Press an Arrow Key", NULL );
+    SDL_WM_SetCaption( "LABERINTO", NULL );
 
     //If everything initialized fine
     return true;
@@ -136,17 +131,14 @@ void clean_up()
 {
     //Free the surfaces
     SDL_FreeSurface( background );
-    SDL_FreeSurface( upMessage );
-    SDL_FreeSurface( downMessage );
-    SDL_FreeSurface( leftMessage );
-    SDL_FreeSurface( rightMessage );
 
     //Close the font
     TTF_CloseFont( font );
+     Mix_FreeMusic( BGM );
 
     //Quit SDL_ttf
     TTF_Quit();
-
+    Mix_CloseAudio();
     //Quit SDL
     SDL_Quit();
 }
@@ -232,7 +224,21 @@ void limpiar(char tablero_de_pasos[5][5])
 
 int main( int argc, char* args[] )
 {
-    //Quit flag
+    if( Mix_OpenAudio( 22050, MIX_DEFAULT_FORMAT, 2, 4096 ) == -1 )
+    {
+        return 1;
+    }
+
+    BGM = Mix_LoadMUS( "BGM.mp3" );
+
+    if( BGM == NULL )
+    {
+        return 1;
+    }
+    bool first_time = true, first_it = true;
+    Mix_PlayMusic(BGM, -1);
+
+   //Quit flag
     bool quit = false;
 
     //Initialize
@@ -246,12 +252,6 @@ int main( int argc, char* args[] )
     {
         return 1;
     }
-
-    //Generate the message surfaces
-    upMessage = TTF_RenderText_Solid( font, "Up was pressed.", textColor );
-    downMessage = TTF_RenderText_Solid( font, "Down was pressed.", textColor );
-    leftMessage = TTF_RenderText_Solid( font, "Left was pressed", textColor );
-    rightMessage = TTF_RenderText_Solid( font, "Right was pressed", textColor );
 
     SDL_Surface* pasillo = load_image("tablero/pasillo.png");
     SDL_Surface* muro = load_image("tablero/muro.png");
@@ -275,13 +275,17 @@ int main( int argc, char* args[] )
                                  {' ',' ',' ',' ',' '},
                                  {' ',' ',' ',' ',' '}};
 
-    SDL_Surface* pasos_surface = load_image("pasos.png");
-    Personaje actual =personaje2;
 
+    char tablero_de_pasos2[5][5]={{' ',' ',' ',' ',' '},
+                                 {' ',' ',' ',' ',' '},
+                                 {' ',' ',' ',' ',' '},
+                                 {' ',' ',' ',' ',' '},
+                                 {' ',' ',' ',' ',' '}};
+
+    SDL_Surface* pasos_surface = load_image("pasos.png");
     SDL_Surface * cursor_surface = load_image("cursor.png");
 
     SDL_Surface * msj1 = TTF_RenderText_Solid( font, "Personaje 1", textColor );
-
     SDL_Surface * msj2 = TTF_RenderText_Solid( font, "Personaje 2", textColor );
 
 
@@ -299,13 +303,7 @@ int main( int argc, char* args[] )
             //If a key was pressed
             if( event.type == SDL_KEYDOWN )
             {
-
-
-                //Set the proper message surface
-                switch( event.key.keysym.sym )
-                {
-
-                  /*   if(cursor_y>2)
+                /*   if(cursor_y>2)
                         cursor_y=2;
 
                      if(cursor_y<-2)
@@ -317,6 +315,9 @@ int main( int argc, char* args[] )
                      if(cursor_x<-2)
                         cursor_x=-2;*/
 
+                //Set the proper message surface
+                switch( event.key.keysym.sym )
+                {
                     case SDLK_UP:
                         cursor_y--;
                     break;
@@ -330,54 +331,55 @@ int main( int argc, char* args[] )
                         cursor_x++;
                     break;
                     case SDLK_RETURN:
-                         if(personaje.activo)
+                         if(turno)
                             {
-                                personaje.activo=false;
-                                actual=personaje2;
-                                personaje.dibujar(screen);
-                                personaje2.activo=true;
+                             if(puedoLLegar(tablero,personaje.x,personaje.y,3,cursor_x,cursor_y))
+                             {
+                                personaje.setX(cursor_x);
+                                personaje.setY(cursor_y);
+
+                                 std::ofstream out("cursor.txt");
+                                 out<<cursor_x<<" ";
+                                 out<<cursor_y<<" ";
+
+                                personaje2.recibirAtaque();
+
+                                cursor_x=personaje.x;
+                                cursor_y=personaje.y;
+
+                                //actual.dibujar(screen);
+                                limpiar(tablero_de_pasos);
+                                marcar(tablero,tablero_de_pasos,personaje.x,personaje.y,3);
+
+                                turno=false;
+
+                             }
 
                             }
-                            else if(personaje2.activo)
+                            else if(!turno)
                             {
-                                personaje2.activo=false;
-                                actual=personaje;
-                                personaje2.dibujar(screen);
-                                personaje.activo=true;
+                               if(puedoLLegar(tablero,personaje2.x,personaje2.y,3,cursor_x,cursor_y))
+                               {
+                                personaje2.setX(cursor_x);
+                                personaje2.setY(cursor_y);
+
+                                personaje.recibirAtaque();
+
+                                 std::ofstream out("cursor.txt");
+                                 out<<cursor_x<<" ";
+                                 out<<cursor_y<<" ";
+
+                                cursor_x=personaje2.x;
+                                cursor_y=personaje2.y;
+
+                                //actual.dibujar(screen);
+                                limpiar(tablero_de_pasos);
+                                marcar(tablero,tablero_de_pasos2,personaje2.x,personaje2.y,3);
+
+                                turno=true;
+
+                               }
                             }
-
-
-                        if(puedoLLegar(tablero,actual.x,actual.y,3,cursor_x,cursor_y))
-                        {
-                            actual.setX(cursor_x);
-                            actual.setY(cursor_y);
-
-                             std::ofstream out("cursor.txt");
-                             out<<cursor_x<<" ";
-                             out<<cursor_y<<" ";
-
-                            cursor_x=actual.x;
-                            cursor_y=actual.y;
-
-                            if(personaje.activo)
-                            {
-                               personaje2.recibirAtaque();
-                               out<<personaje2.vida<<" ";
-
-                            }
-                            else if(personaje2.activo)
-                            {
-                               personaje.recibirAtaque();
-                               out<<personaje.vida<<" ";
-
-                            }
-
-                            //actual.dibujar(screen);
-                            limpiar(tablero_de_pasos);
-                            marcar(tablero,tablero_de_pasos,actual.x,actual.y,3);
-
-                        }
-
                     break;
                 }
             }
@@ -392,10 +394,8 @@ int main( int argc, char* args[] )
 
         }
 
-
         //Apply the background
         apply_surface( 0, 0, background, screen );
-
 
         //If a message needs to be displayed
         if( message != NULL )
@@ -447,8 +447,8 @@ int main( int argc, char* args[] )
         }
 
 
-        actual.dibujar(screen) ;
-
+        personaje.dibujar(screen) ;
+        personaje2.dibujar(screen) ;
 
         //Update the screen
         if( SDL_Flip( screen ) == -1 )

@@ -6,7 +6,6 @@ Personaje::Personaje(int x,int y,SDL_Surface*imagen)
     this->y=y;
     this->imagen=imagen;
     this->vida=100;
-    this->activo=true;
 }
 
 
