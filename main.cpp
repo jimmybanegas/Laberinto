@@ -237,7 +237,6 @@ int main( int argc, char* args[] )
 
     SDL_Surface* pasillo = load_image("tablero/pasillo.png");
     SDL_Surface* muro = load_image("tablero/muro.png");
-    SDL_Surface* cursor = load_image("tablero/cursor.png");
     SDL_Surface* obstaculo = load_image("tablero/obstaculo.png");
     SDL_Surface* ventaja = load_image("tablero/ventaja.png");
 
@@ -351,6 +350,9 @@ int main( int argc, char* args[] )
                                }
                             }
                     break;
+
+                    default :
+                        ;
                 }
             }
 
@@ -413,9 +415,6 @@ int main( int argc, char* args[] )
 
         if(personaje.vida==0)
         {
-             SDL_Rect offset;
-             offset.x = 0;
-             offset.y = 0;
              apply_surface( 0, 0, background, screen );
              apply_surface( 0, 0, gameover, screen );
              apply_surface( 280,500,gana,screen);
@@ -425,9 +424,6 @@ int main( int argc, char* args[] )
 
         if(personaje2.vida==0)
         {
-             SDL_Rect offset;
-             offset.x = 0;
-             offset.y = 0;
              apply_surface( 0, 0, background, screen );
              apply_surface( 0, 0, gameover, screen );
              apply_surface( 280,500,gana,screen);
