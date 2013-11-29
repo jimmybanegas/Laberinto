@@ -417,7 +417,6 @@ int main( int argc, char* args[] )
              offset.x = 0;
              offset.y = 0;
              SDL_BlitSurface( gameover, NULL, screen, &offset );
-             break;
         }
 
         //Update the screen
