@@ -401,10 +401,10 @@ int main( int argc, char* args[] )
 
         apply_surface(cursor_x*75,cursor_y*75,cursor_surface,screen);
 
-        apply_surface(610,30,msj1,screen);
-        apply_surface(610,80,msj2,screen);
-        apply_surface(610,50,vidas_surface,screen);
-        apply_surface(610,100,vidas_surface2,screen);
+        apply_surface(635,30,msj1,screen);
+        apply_surface(635,80,msj2,screen);
+        apply_surface(635,50,vidas_surface,screen);
+        apply_surface(635,100,vidas_surface2,screen);
 
 
 
