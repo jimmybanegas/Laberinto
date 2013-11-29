@@ -280,6 +280,7 @@ int main( int argc, char* args[] )
 
     SDL_Surface * msj1 = TTF_RenderText_Solid( font, "Personaje 1", textColor );
     SDL_Surface * msj2 = TTF_RenderText_Solid( font, "Personaje 2", textColor );
+    SDL_Surface * gana = TTF_RenderText_Solid( font, "PERSONAJE GANADOR ", textColor );
 
     //While the user hasn't quit
     while( quit == false )
@@ -407,16 +408,30 @@ int main( int argc, char* args[] )
         apply_surface(635,100,vidas_surface2,screen);
 
 
-
         personaje.dibujar(screen) ;
         personaje2.dibujar(screen) ;
 
-        if(personaje.vida==0 || personaje2.vida==0)
+        if(personaje.vida==0)
         {
              SDL_Rect offset;
              offset.x = 0;
              offset.y = 0;
-             SDL_BlitSurface( gameover, NULL, screen, &offset );
+             apply_surface( 0, 0, background, screen );
+             apply_surface( 0, 0, gameover, screen );
+             apply_surface( 280,500,gana,screen);
+             apply_surface( 350,520,personaje2_surface,screen);
+
+        }
+
+        if(personaje2.vida==0)
+        {
+             SDL_Rect offset;
+             offset.x = 0;
+             offset.y = 0;
+             apply_surface( 0, 0, background, screen );
+             apply_surface( 0, 0, gameover, screen );
+             apply_surface( 280,500,gana,screen);
+             apply_surface( 350,520,personaje_surface,screen);
         }
 
         //Update the screen
