@@ -1,7 +1,3 @@
-/*This source code copyrighted by Lazy Foo' Productions (2004-2013)
-and may not be redistributed without written permission.*/
-
-//The headers
 #include "SDL/SDL.h"
 #include "SDL/SDL_image.h"
 #include "SDL/SDL_ttf.h"
@@ -11,10 +7,9 @@ and may not be redistributed without written permission.*/
 #include <fstream>
 #include "Personaje.h"
 
-
 //Screen attributes
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_WIDTH = 790;
+const int SCREEN_HEIGHT = 600;
 const int SCREEN_BPP = 32;
 
 //The surfaces
@@ -28,14 +23,8 @@ bool turno=true;
  int cursor_x=0;
  int cursor_y=0;
 
-
-//The event structure
 SDL_Event event;
-
-//The font
 TTF_Font *font = NULL;
-
-//The color of the font
 SDL_Color textColor = { 0, 0, 0 };
 
 std::string toString(int number)
@@ -54,7 +43,6 @@ std::string toString(int number)
     return returnvalue;
 }
 
-
 SDL_Surface *load_image( std::string filename )
 {
     return IMG_Load( filename.c_str() );
@@ -62,14 +50,9 @@ SDL_Surface *load_image( std::string filename )
 
 void apply_surface( int x, int y, SDL_Surface* source, SDL_Surface* destination, SDL_Rect* clip = NULL )
 {
-    //Holds offsets
     SDL_Rect offset;
-
-    //Get offsets
     offset.x = x;
     offset.y = y;
-
-    //Blit
     SDL_BlitSurface( source, clip, destination, &offset );
 }
 
@@ -106,7 +89,7 @@ bool init()
 bool load_files()
 {
     //Load the background image
-    background = load_image( "background.png" );
+    background = load_image( "tablero/background.png" );
 
     //Open the font
     font = TTF_OpenFont( "lazy.ttf", 30 );
@@ -134,7 +117,7 @@ void clean_up()
 
     //Close the font
     TTF_CloseFont( font );
-     Mix_FreeMusic( music );
+    Mix_FreeMusic( music );
 
     //Quit SDL_ttf
     TTF_Quit();
@@ -143,33 +126,30 @@ void clean_up()
     SDL_Quit();
 }
 
-bool puedoLLegar(char tablero[5][5],int x_actual, int y_actual,int pasos, int x_final, int y_final)
+bool puedoLLegar(char tablero[8][8],int x_actual, int y_actual,int pasos, int x_final, int y_final)
 {
     //Casos base
     if(pasos<0)
         return false;
 
-    if(x_actual>=5
-       || y_actual>=5
-       || x_actual<0
-       || y_actual<0)
+    if(x_actual>=8 || y_actual>=8 || x_actual<0 || y_actual<0)
        return false;
 
     if(tablero[y_actual][x_actual]=='#')
        return false;
 
-    if(x_actual==x_final
-       && y_actual==y_final)
+    if(x_actual==x_final && y_actual==y_final)
        return true;
 
     if(tablero[y_actual][x_actual]=='O')
         pasos--;
 
-    pasos--;
+    if(tablero[y_actual][x_actual]=='V')
+        pasos++;
 
-//    if(tablero[y_actual][x_actual]=='V'
-//       && pasos<=0)
-//        pasos=1;
+    if(tablero[y_actual][x_actual]=='V' && pasos<=0)
+            pasos=1;
+    pasos--;
 
     return puedoLLegar(tablero,x_actual+1,y_actual,pasos,x_final,y_final)
             || puedoLLegar(tablero,x_actual-1,y_actual,pasos,x_final,y_final)
@@ -177,50 +157,52 @@ bool puedoLLegar(char tablero[5][5],int x_actual, int y_actual,int pasos, int x_
             || puedoLLegar(tablero,x_actual,y_actual-1,pasos,x_final,y_final);
 }
 
-void marcar(char tablero[5][5],char tablero_de_pasos[5][5],int x_actual, int y_actual,int pasos)
+void marcar(char tablero[8][8],char tablero_de_pasos[8][8],char rango_ataque[8][8],int x_actual, int y_actual,int pasos)
 {
-    //Casos base
     if(pasos<0)
         return;
 
-    if(x_actual>=5
-       || y_actual>=5
-       || x_actual<0
-       || y_actual<0)
-       return;
+    if(x_actual>=8 || y_actual>=8  || x_actual<0 || y_actual<0)
+        return;
 
     if(tablero[y_actual][x_actual]=='#')
        return;
 
     tablero_de_pasos[y_actual][x_actual]='P';
 
+    if (pasos>=1&&tablero[y_actual][x_actual]==' ')
+        rango_ataque[y_actual][x_actual]='A';
+
     if(tablero[y_actual][x_actual]=='O')
         pasos--;
 
+    if(tablero[y_actual][x_actual]=='V')
+        pasos++;
+    if(tablero[y_actual][x_actual]=='V' && pasos<=0)
+            pasos=1;
     pasos--;
 
-//    if(tablero[y_actual][x_actual]=='V'
-//       && pasos<=0)
-//        pasos=1;
-
-    marcar(tablero,tablero_de_pasos,x_actual+1,y_actual,pasos);
-    marcar(tablero,tablero_de_pasos,x_actual-1,y_actual,pasos);
-    marcar(tablero,tablero_de_pasos,x_actual,y_actual+1,pasos);
-    marcar(tablero,tablero_de_pasos,x_actual,y_actual-1,pasos);
+    marcar(tablero,tablero_de_pasos,rango_ataque,x_actual+1,y_actual,pasos);
+    marcar(tablero,tablero_de_pasos,rango_ataque,x_actual-1,y_actual,pasos);
+    marcar(tablero,tablero_de_pasos,rango_ataque,x_actual,y_actual+1,pasos);
+    marcar(tablero,tablero_de_pasos,rango_ataque,x_actual,y_actual-1,pasos);
 }
 
-void limpiar(char tablero_de_pasos[5][5])
+void limpiar(char tablero_de_pasos[8][8], char rango_ataque[8][8])
 {
-    for(int x=0;x<5;x++)
-        for(int y=0;y<5;y++)
-            tablero_de_pasos[y][x]=' ';
+    for(int x=0;x<8;x++)
+        for(int y=0;y<8;y++)
+        {
+           tablero_de_pasos[y][x]=' ';
+           rango_ataque[y][x]=' ';
+        }
+
 }
 
- SDL_Surface* personaje_surface = load_image("personaje.png");
- SDL_Surface* personaje2_surface = load_image("personaje2.png");
+ SDL_Surface* personaje_surface = load_image("tablero/personaje.png");
+ SDL_Surface* personaje2_surface = load_image("tablero/personaje2.png");
  Personaje personaje(2,3,personaje_surface);
- Personaje personaje2(2,1,personaje2_surface);
-
+ Personaje personaje2(6,1,personaje2_surface);
 
 int main( int argc, char* args[] )
 {
@@ -236,8 +218,7 @@ int main( int argc, char* args[] )
         return 1;
     }
 
-  //  bool first_time = true, first_it = true;
- //   Mix_PlayMusic(music, -1);
+    //Mix_PlayMusic(music, -1);
 
    //Quit flag
     bool quit = false;
@@ -259,32 +240,43 @@ int main( int argc, char* args[] )
     SDL_Surface* cursor = load_image("tablero/cursor.png");
     SDL_Surface* obstaculo = load_image("tablero/obstaculo.png");
     SDL_Surface* ventaja = load_image("tablero/ventaja.png");
-    TTF_Font *font = TTF_OpenFont( "lazy.ttf", 30 );
-
-    SDL_Surface * gameover = load_image("gameover.png");
 
 
-    char tablero[5][5]={{' ','#',' ','O','V'},
-                        {' ','#',' ','#',' '},
-                        {'V','#',' ','#',' '},
-                        {'V','#',' ','#','#'},
-                        {' ','O','O',' ',' '}};
+    TTF_Font *font = TTF_OpenFont( "lazy.ttf", 24 );
 
-    char tablero_de_pasos[5][5]={{' ',' ',' ',' ',' '},
-                                 {' ',' ',' ',' ',' '},
-                                 {' ',' ',' ',' ',' '},
-                                 {' ',' ',' ',' ',' '},
-                                 {' ',' ',' ',' ',' '}};
+    SDL_Surface * gameover = load_image("tablero/gameover.png");
 
 
-    char tablero_de_pasos2[5][5]={{' ',' ',' ',' ',' '},
-                                 {' ',' ',' ',' ',' '},
-                                 {' ',' ',' ',' ',' '},
-                                 {' ',' ',' ',' ',' '},
-                                 {' ',' ',' ',' ',' '}};
+    char tablero[8][8]=        {{' ','#',' ','O','V',' ','O','#'},
+                                {' ','#',' ','#',' ','#',' ','#'},
+                                {' ','#','V','#',' ',' ',' ','#'},
+                                {' ','#',' ','#',' ','#',' ','#'},
+                                {' ','#',' ','#',' ',' ','V','#'},
+                                {'V','#',' ','#','V','#',' ','#'},
+                                {' ',' ',' ','#',' ',' ',' ',' '},
+                                {' ','O',' ',' ',' ','#',' ','#'}};
 
-    SDL_Surface* pasos_surface = load_image("pasos.png");
-    SDL_Surface * cursor_surface = load_image("cursor.png");
+    char tablero_de_pasos[8][8]={{' ',' ',' ',' ',' ',' ',' ',' '},
+                                 {' ',' ',' ',' ',' ',' ',' ',' '},
+                                 {' ',' ',' ',' ',' ',' ',' ',' '},
+                                 {' ',' ',' ',' ',' ',' ',' ',' '},
+                                 {' ',' ',' ',' ',' ',' ',' ',' '},
+                                 {' ',' ',' ',' ',' ',' ',' ',' '},
+                                 {' ',' ',' ',' ',' ',' ',' ',' '},
+                                 {' ',' ',' ',' ',' ',' ',' ',' '}};
+
+    char rango_ataque[8][8]=   {{' ',' ',' ',' ',' ',' ',' ',' '},
+                                {' ',' ',' ',' ',' ',' ',' ',' '},
+                                {' ',' ',' ',' ',' ',' ',' ',' '},
+                                {' ',' ',' ',' ',' ',' ',' ',' '},
+                                {' ',' ',' ',' ',' ',' ',' ',' '},
+                                {' ',' ',' ',' ',' ',' ',' ',' '},
+                                {' ',' ',' ',' ',' ',' ',' ',' '},
+                                {' ',' ',' ',' ',' ',' ',' ',' '}};
+
+    SDL_Surface* pasos_surface = load_image("tablero/pasos.png");
+    SDL_Surface* ataque = load_image("tablero/ataque.png");
+    SDL_Surface * cursor_surface = load_image("tablero/cursor.png");
 
     SDL_Surface * msj1 = TTF_RenderText_Solid( font, "Personaje 1", textColor );
     SDL_Surface * msj2 = TTF_RenderText_Solid( font, "Personaje 2", textColor );
@@ -298,22 +290,17 @@ int main( int argc, char* args[] )
         //If there's an event to handle
         if( SDL_PollEvent( &event ) )
         {
-
+             if (cursor_x>7)
+                cursor_x=7;
+             if (cursor_y>7)
+                cursor_y=7;
+             if (cursor_x<0)
+                cursor_x=0;
+             if (cursor_y<0)
+                cursor_y=0;
             //If a key was pressed
             if( event.type == SDL_KEYDOWN )
             {
-                     if(cursor_y>5)
-                        cursor_y=5;
-
-                     if(cursor_y<-5)
-                        cursor_y=-5;
-
-                     if(cursor_x>5)
-                      cursor_x=5;
-
-                     if(cursor_x<-5)
-                        cursor_x=-5;
-                //Set the proper message surface
                 switch( event.key.keysym.sym )
                 {
                     case SDLK_UP:
@@ -333,14 +320,14 @@ int main( int argc, char* args[] )
                             {
                              if(puedoLLegar(tablero,personaje.x,personaje.y,3,cursor_x,cursor_y))
                              {
-                                personaje.setX(cursor_x);
-                                personaje.setY(cursor_y);
-                                personaje2.recibirAtaque();
-                                cursor_x=personaje.x;
-                                cursor_y=personaje.y;
+                                personaje.x=cursor_x;
+                                personaje.y=cursor_y;
 
-                                limpiar(tablero_de_pasos);
-                                marcar(tablero,tablero_de_pasos,personaje.x,personaje.y,3);
+                                if (rango_ataque[personaje.y][personaje.x]=='A')
+                                  personaje2.recibirAtaque();
+
+                                limpiar(tablero_de_pasos,rango_ataque);
+                                marcar(tablero,tablero_de_pasos,rango_ataque,personaje.x,personaje.y,3);
 
                                 turno=false;
                              }
@@ -350,15 +337,14 @@ int main( int argc, char* args[] )
                             {
                                if(puedoLLegar(tablero,personaje2.x,personaje2.y,3,cursor_x,cursor_y))
                                {
-                                personaje2.setX(cursor_x);
-                                personaje2.setY(cursor_y);
+                                personaje2.x=cursor_x;
+                                personaje2.y=cursor_y;
 
-                                personaje.recibirAtaque();
-                                cursor_x=personaje2.x;
-                                cursor_y=personaje2.y;
+                                if (rango_ataque[personaje2.y][personaje2.x]=='A')
+                                  personaje.recibirAtaque();
 
-                                limpiar(tablero_de_pasos);
-                                marcar(tablero,tablero_de_pasos2,personaje2.x,personaje2.y,3);
+                                limpiar(tablero_de_pasos,rango_ataque);
+                                marcar(tablero,tablero_de_pasos,rango_ataque,personaje2.x,personaje2.y,3);
 
                                 turno=true;
                                }
@@ -367,33 +353,24 @@ int main( int argc, char* args[] )
                 }
             }
 
-            //If the user has Xed out the window
             else if( event.type == SDL_QUIT )
             {
-                //Quit the program
                 quit = true;
             }
 
         }
 
-        //Apply the background
         apply_surface( 0, 0, background, screen );
 
-        //If a message needs to be displayed
         if( message != NULL )
         {
-            //Apply the background to the screen
             apply_surface( 0, 0, background, screen );
-
-            //Apply the message centered on the screen
             apply_surface( ( SCREEN_WIDTH - message->w ) / 2, ( SCREEN_HEIGHT - message->h ) / 2, message, screen );
-
-            //Null the surface pointer
             message = NULL;
         }
 
-        for(int x=0;x<5;x++)
-            for(int y=0;y<5;y++)
+        for(int x=0;x<8;x++)
+            for(int y=0;y<8;y++)
             {
                 if(tablero[y][x]==' ')
                     apply_surface(x*75,y*75,pasillo,screen);
@@ -405,18 +382,34 @@ int main( int argc, char* args[] )
                     apply_surface(x*75,y*75,ventaja,screen);
             }
 
-        for(int x=0;x<5;x++)
-            for(int y=0;y<5;y++)
+        for(int x=0;x<8;x++)
+            for(int y=0;y<8;y++)
                 if(tablero_de_pasos[y][x]=='P')
                     apply_surface(x*75,y*75,pasos_surface,screen);
 
+        for(int x=0;x<8;x++)
+         {
+            for(int y=0;y<8;y++){
+            if(tablero_de_pasos[y][x]=='P'){
+            apply_surface(x*75,y*75,pasos_surface,screen);
+            }
+             if(rango_ataque[y][x]=='A'){
+               apply_surface(x*75,y*75,ataque,screen);
+             }
+            }
+         }
 
         apply_surface(cursor_x*75,cursor_y*75,cursor_surface,screen);
 
-        apply_surface(400,30,msj1,screen);
-        apply_surface(400,80,msj2,screen);
-        apply_surface(400,50,vidas_surface,screen);
-        apply_surface(400,100,vidas_surface2,screen);
+        apply_surface(610,30,msj1,screen);
+        apply_surface(610,80,msj2,screen);
+        apply_surface(610,50,vidas_surface,screen);
+        apply_surface(610,100,vidas_surface2,screen);
+
+
+
+        personaje.dibujar(screen) ;
+        personaje2.dibujar(screen) ;
 
         if(personaje.vida==0 || personaje2.vida==0)
         {
@@ -424,13 +417,8 @@ int main( int argc, char* args[] )
              offset.x = 0;
              offset.y = 0;
              SDL_BlitSurface( gameover, NULL, screen, &offset );
-           // apply_surface( -10, 0,gameover, screen );
-
+             break;
         }
-
-
-        personaje.dibujar(screen) ;
-        personaje2.dibujar(screen) ;
 
         //Update the screen
         if( SDL_Flip( screen ) == -1 )
@@ -440,7 +428,6 @@ int main( int argc, char* args[] )
 
     }
 
-    //Clean up
     clean_up();
 
     return 0;
