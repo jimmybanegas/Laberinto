@@ -27,6 +27,7 @@ SDL_Event event;
 TTF_Font *font = NULL;
 SDL_Color textColor = { 0, 0, 0 };
 
+
 std::string toString(int number)
 {
     if (number == 0)
@@ -114,11 +115,9 @@ void clean_up()
 {
     //Free the surfaces
     SDL_FreeSurface( background );
-
     //Close the font
     TTF_CloseFont( font );
     Mix_FreeMusic( music );
-
     //Quit SDL_ttf
     TTF_Quit();
     Mix_CloseAudio();
@@ -218,6 +217,7 @@ int main( int argc, char* args[] )
         return 1;
     }
 
+
     //Mix_PlayMusic(music, -1);
 
    //Quit flag
@@ -286,6 +286,7 @@ int main( int argc, char* args[] )
     {
     SDL_Surface * vidas_surface = TTF_RenderText_Solid( font, toString(personaje.vida).c_str(), textColor );
     SDL_Surface * vidas_surface2 = TTF_RenderText_Solid( font, toString(personaje2.vida).c_str(), textColor );
+    SDL_Surface * tur = TTF_RenderText_Solid( font, "Turno de :" , textColor );
 
         //If there's an event to handle
         if( SDL_PollEvent( &event ) )
@@ -298,6 +299,7 @@ int main( int argc, char* args[] )
                 cursor_x=0;
              if (cursor_y<0)
                 cursor_y=0;
+
             //If a key was pressed
             if( event.type == SDL_KEYDOWN )
             {
@@ -328,8 +330,9 @@ int main( int argc, char* args[] )
 
                                 limpiar(tablero_de_pasos,rango_ataque);
                                 marcar(tablero,tablero_de_pasos,rango_ataque,personaje.x,personaje.y,3);
-
                                 turno=false;
+
+
                              }
 
                             }
@@ -345,14 +348,17 @@ int main( int argc, char* args[] )
 
                                 limpiar(tablero_de_pasos,rango_ataque);
                                 marcar(tablero,tablero_de_pasos,rango_ataque,personaje2.x,personaje2.y,3);
+                                apply_surface( 635,200,tur,screen);
+                              //  apply_surface( 635,220,personaje_surface,screen);
 
                                 turno=true;
+
                                }
                             }
                     break;
 
                     default :
-                        ;
+                    ;
                 }
             }
 
@@ -360,7 +366,6 @@ int main( int argc, char* args[] )
             {
                 quit = true;
             }
-
         }
 
         apply_surface( 0, 0, background, screen );
@@ -409,6 +414,18 @@ int main( int argc, char* args[] )
         apply_surface(635,50,vidas_surface,screen);
         apply_surface(635,100,vidas_surface2,screen);
 
+        if(turno)
+        {
+              apply_surface( 635,200,tur,screen);
+              apply_surface( 635,220,personaje_surface,screen);
+        }
+        else if(!turno)
+        {
+              apply_surface( 635,200,tur,screen);
+              apply_surface( 635,220,personaje2_surface,screen);
+        }
+
+       // apply_surface( 670,450,salir,screen);
 
         personaje.dibujar(screen) ;
         personaje2.dibujar(screen) ;
